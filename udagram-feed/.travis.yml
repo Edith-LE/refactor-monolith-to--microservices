@@ -1,0 +1,27 @@
+language: node_js
+node_js:
+  - 13
+
+services:
+  - docker
+
+script:
+  - cd udagram-frontend
+  - docker build -t udagram-frontend .
+  - docker tag udagram-frontend edithle/udagram-frontend:latest
+  - cd ../udagram-users
+  - docker build -t udagram-users .
+  - docker tag udagram-users edithle/udagram-users:latest
+  - cd ../udagram-feed
+  - docker build -t udagram-feed .
+  - docker tag udagram-feed edithle/udagram-feed:latest
+  - cd ../udagram-reverse-proxy
+  - docker build -t udagram-reverse-proxy .
+  - docker tag udagram-reverse-proxy:latest edithle/udagram-reverse-proxy
+
+after_success:
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+  - docker push edithle/udagram-frontend:latest
+  - docker push edithle/udagram-users:latest
+  - docker push edithle/udagram-feed:latest
+  - docker push edithle/udagram-reverse-proxy
